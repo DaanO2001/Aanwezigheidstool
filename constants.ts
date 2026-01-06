@@ -2,11 +2,7 @@
 // CONFIGURATIE
 // =====================================================================
 
-// PLAK HIER ONDER JE GOOGLE APPS SCRIPT WEB APP URL
-// Voorbeeld: "https://script.google.com/macros/s/AKfycbx.../exec"
-export const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzU5eZB1l31flKPptY995rg36p32sgOwwO7PyqxIdsN44E9HsK_4AFmwMp3rq1HRJ5_yg/exec"; 
-
-// Als deze leeg is, simuleert de app een succesvolle netwerk aanroep na 1 seconde.
+// Google Sheets integratie is verwijderd. De app werkt nu lokaal.
 
 // Lijst van 50 medewerkers, gesorteerd op achternaam
 export const EMPLOYEES = [
