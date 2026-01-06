@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medewerker Check-in</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary: #10b981; /* Emerald 500 */
+        --primary-dark: #059669; /* Emerald 600 */
+        --secondary: #64748b; /* Slate 500 */
+        --secondary-dark: #475569; /* Slate 600 */
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #94a3b8;
+        --error: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        /* Animated Gradient Background */
+        background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #f1f5f9, #cbd5e1);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-main);
+        padding: 1rem;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* Card Container */
+      .card {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 420px;
+        padding: 2.5rem;
+        border-radius: 24px;
+        box-shadow: 
+          0 20px 25px -5px rgba(0, 0, 0, 0.05), 
+          0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        text-align: center;
+        animation: fadeUp 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Header Elements */
+      .date-badge {
+        display: inline-block;
+        background: #f1f5f9;
+        color: var(--secondary);
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.02);
+      }
+
+      h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        transition: all 0.3s ease; /* Smooth transition for text change */
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Input Field */
+      .input-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+        margin-left: 4px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        font-family: inherit;
+        font-size: 1rem;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      input[type="text"]:focus {
+        background: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+      }
+
+      input[type="text"].error {
+        border-color: var(--error);
+        background: #fef2f2;
+      }
+
+      /* Buttons */
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      button {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 14px;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      /* Primary Button (In) */
+      .btn-in {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+      }
+
+      .btn-in:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+      }
+
+      /* Secondary Button (Out) */
+      .btn-out {
+        background: transparent;
+        border: 2px solid #e2e8f0;
+        color: var(--secondary);
+      }
+
+      .btn-out:hover:not(:disabled) {
+        border-color: var(--secondary);
+        color: var(--secondary-dark);
+        background: #f8fafc;
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      /* Success Message */
+      .success-box {
+        display: none; /* Hidden by default */
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #ecfdf5;
+        border: 1px solid #d1fae5;
+        border-radius: 12px;
+        color: #065f46;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease-out;
+      }
+      
+      .success-box.visible {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Icons styling */
+      .icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+        display: none;
+      }
+      
+      .btn-out .loading-spinner {
+        border-color: rgba(0,0,0,0.1);
+        border-top-color: var(--secondary);
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="card">
+      <!-- Date Header -->
+      <div id="clock" class="date-badge">
+        Loading date...
+      </div>
+
+      <!-- Greeting -->
+      <div class="header-content">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">👋</div>
+        <h1 id="greeting">Welkom!</h1>
+        <p class="subtitle">Registreer je aanwezigheid voor vandaag.</p>
+      </div>
+
+      <!-- Input Form -->
+      <div class="input-group">
+        <label for="nameInput">Naam medewerker</label>
+        <input type="text" id="nameInput" placeholder="Bijv. Jan de Vries" autocomplete="off">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="btn-container">
+        <button id="btnIn" class="btn-in" onclick="handleAction('Ingeklokt', 'btnIn')">
+          <div class="loading-spinner" id="spinnerIn"></div>
+          <span id="textIn">Meld mij aanwezig</span>
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </button>
+
+        <button id="btnOut" class="btn-out" onclick="handleAction('Uitgeklokt', 'btnOut')">
+          <div class="loading-spinner" id="spinnerOut"></div>
+          <span id="textOut">Meld mij afwezig</span>
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        </button>
+      </div>
+
+      <!-- Success Feedback -->
+      <div id="successMessage" class="success-box">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>Status succesvol bijgewerkt!</span>
+      </div>
+    </div>
+
+    <script>
+      // 1. Initial Setup: Clock & Greeting logic
+      function getGreetingText() {
+        const now = new Date();
+        const hour = now.getHours();
+        if (hour >= 6 && hour < 12) return 'Goedemorgen!';
+        if (hour >= 12 && hour < 18) return 'Goedemiddag!';
+        return 'Goedenavond!';
+      }
+
+      function updateTimeAndGreeting() {
+        const now = new Date();
+        
+        // Date formatting: "Maandag 24 Oktober - 14:30"
+        const options = { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('clock').textContent = now.toLocaleDateString('nl-NL', options);
+
+        // Only update greeting from time if the input field is empty
+        const nameInput = document.getElementById('nameInput');
+        if (!nameInput.value.trim()) {
+           document.getElementById('greeting').textContent = getGreetingText();
+        }
+      }
+
+      // Add Listener for Dynamic Name Greeting
+      document.getElementById('nameInput').addEventListener('input', function(e) {
+        const fullName = e.target.value.trim();
+        const greetingEl = document.getElementById('greeting');
+
+        if (fullName.length > 0) {
+            // Get first name (everything before the first space)
+            const firstName = fullName.split(' ')[0];
+            // Capitalize first letter (optional polish)
+            const formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+            greetingEl.textContent = `Welkom ${formattedName}!`;
+        } else {
+            // Revert to time-based greeting if cleared
+            greetingEl.textContent = getGreetingText();
+        }
+      });
+
+      // Run immediately and every second
+      updateTimeAndGreeting();
+      setInterval(updateTimeAndGreeting, 60000); // Update every minute is enough for UI
+
+      // 2. Action Handling
+      function handleAction(status, btnId) {
+        const nameInput = document.getElementById('nameInput');
+        const name = nameInput.value.trim();
+        const btn = document.getElementById(btnId);
+        const textSpan = document.getElementById(btnId === 'btnIn' ? 'textIn' : 'textOut');
+        const spinner = document.getElementById(btnId === 'btnIn' ? 'spinnerIn' : 'spinnerOut');
+        const successBox = document.getElementById('successMessage');
+
+        // Validation
+        if (!name) {
+          nameInput.classList.add('error');
+          nameInput.placeholder = "Vul aub een naam in...";
+          nameInput.focus();
+          setTimeout(() => nameInput.classList.remove('error'), 2000);
+          return;
+        }
+
+        // Set Loading State
+        document.querySelectorAll('button').forEach(b => b.disabled = true);
+        const originalText = textSpan.textContent;
+        textSpan.textContent = "Even geduld...";
+        spinner.style.display = "block";
+        successBox.classList.remove('visible');
+
+        // Call Google Apps Script Backend
+        // Note: 'verwerkInklokken' must be defined in your .gs file
+        google.script.run
+          .withSuccessHandler(() => {
+            onSuccess(btnId, originalText);
+          })
+          .withFailureHandler((error) => {
+            onFailure(error, btnId, originalText);
+          })
+          .verwerkInklokken(name, status);
+      }
+
+      function onSuccess(btnId, originalText) {
+        resetUI(btnId, originalText);
+        
+        // Show Success
+        const successBox = document.getElementById('successMessage');
+        const nameInput = document.getElementById('nameInput');
+        
+        successBox.innerHTML = `
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>Bedankt ${nameInput.value}, het is opgeslagen!</span>
+        `;
+        successBox.classList.add('visible');
+        
+        // Clear input and revert greeting
+        nameInput.value = '';
+        document.getElementById('greeting').textContent = getGreetingText();
+
+        // Auto hide success message after 5 seconds
+        setTimeout(() => {
+          successBox.classList.remove('visible');
+        }, 5000);
+      }
+
+      function onFailure(error, btnId, originalText) {
+        resetUI(btnId, originalText);
+        alert("Er is iets misgegaan: " + error.message);
+      }
+
+      function resetUI(btnId, originalText) {
+        // Restore buttons
+        document.querySelectorAll('button').forEach(b => b.disabled = false);
+        
+        const textSpan = document.getElementById(btnId === 'btnIn' ? 'textIn' : 'textOut');
+        const spinner = document.getElementById(btnId === 'btnIn' ? 'spinnerIn' : 'spinnerOut');
+        
+        textSpan.textContent = originalText;
+        spinner.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
