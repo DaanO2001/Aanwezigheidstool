@@ -2,7 +2,10 @@
 // CONFIGURATIE
 // =====================================================================
 
-// Google Sheets integratie is verwijderd. De app werkt nu lokaal.
+// constants.ts
+
+// Zorg dat 'export' ervoor staat en de naam exact WEBHOOK_URL is
+export const WEBHOOK_URL = "https://script.google.com/macros/s/......./exec";
 
 // Lijst van 50 medewerkers, gesorteerd op achternaam
 export const EMPLOYEES = [
